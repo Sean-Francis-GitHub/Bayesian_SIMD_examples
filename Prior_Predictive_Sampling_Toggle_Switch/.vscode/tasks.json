@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "C/C++: cl.exe build with MKL and OpenMP",
+      "command": "cl.exe",
+      "args": [
+        "/Zi",
+        "/EHsc",
+        "/nologo",
+        "/openmp:experimental",
+        "/I", "${env:MKLROOT}\\include",
+        "${file}",
+        "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
+        "/link",
+        "/LIBPATH:${env:MKLROOT}\\lib\\intel64",
+        "mkl_intel_lp64.lib",
+        "mkl_sequential.lib",
+        "mkl_core.lib",
+        "libiomp5md.lib",
+        ],
+      "options": {
+        "cwd": "${fileDirname}",
+        "PATH": "${env:PATH};${env:MKLROOT}\\bin"
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Build with Intel MKL and OpenMP"
+    }
+  ]
+}

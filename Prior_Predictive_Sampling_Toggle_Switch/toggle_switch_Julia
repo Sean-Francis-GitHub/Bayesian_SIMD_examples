@@ -1,0 +1,81 @@
+# This script attempts to recreate toggle switch code in recreate
+using Distributions
+using Random
+using Statistics
+using BenchmarkTools
+
+@everywhere function simulate_toggle_switch_vec(mu, sigma, gam, alpha,beta, T, C)
+    u_t = Vector{float}(undef, C)
+    v_t = Vector{float}(undef, C)
+
+    alpha_u = alpha[1]
+    alpha_v = alpha[2]
+
+    beta_u = beta[1]
+    beta_v = beta[2]
+
+    u_t[1:C] = 10
+    u_v[1:C] = 10
+
+    # Generate random variates
+    zeta = zeros(C, 2*(T-1)+1)
+    zeta[:, :] = rand(Normal(0, 1), C*(2*(T-1)+1))
+
+    for j = 2:T
+        p_u = v_t .^ beta_u
+        p_v = u_t .^ beta_v
+
+        u_t = 0.97.*u_t .+ alpha_u./(1 .+ p_u) .- 1.0 .+ 0.5.*zeta[1:C, 2*(j-1)]
+        v_t = 0.97.*v_t .+ alpha_v./(1 .+ p_v) .- 1.0 .+ 0.5.*zeta[1:C, 2*(j-1) + 1]
+
+        u_t[u_t .< 1.0] .= 1.0
+        v_t[v_t .< 1.0] .= 1.0
+    end
+
+    y = u_t .+ sigma .* mu .* zeta[1:C, 1]./(u_t.^gam)
+    y[y .< 1.0] = 1.0
+
+    return y
+end
+
+# Prior predictive sampling
+T = 600
+C = 8000
+N = 8064
+
+
+# Add available workers
+P = Sys.CPU_THREADS - 1
+addprocs(P)
+
+@everywhere using Random
+@everywhere using Statistics
+
+
+@everywhere function generate_sample(T, C)
+    theta = rand(Uniform.(
+        [250.0, 0.05, 0.05, 0.0, 0.0, 0.0, 0.0],
+        [400.0, 0.5, 0.35, 50.0, 50.0, 7.0, 7.0]
+    ))
+
+    mu = theta[1]
+    sigma = theta[2]
+    gam = theta[3]
+    alpha = theta[4:5]
+    beta = theta[6:7]
+
+    result = simulate_toggle_switch_vec(mu, sigma, gam, alpha, beta, T, C)
+    return vcat(theta, result)  # Combine theta and simulation output
+end
+
+
+# Time the parallel execution
+@time begin
+    obs_vals2 = pmap(x -> generate_sample(T, C), 1:N)
+end
+
+println((P, N, C, T))
+
+
+
+

@@ -5,7 +5,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *  
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -45,6 +45,7 @@
 /* Intel headers */
 #include <mkl.h>
 #include <mkl_vsl.h>
+#include <malloc.h>  // For _mm_malloc and _mm_free
 
 /* OpenMP header */
 #include <omp.h>
@@ -63,6 +64,10 @@
     #define VECLEN 2
     #define ALIGN 16
 #endif
+
+/* Assume AVX2*/
+#define VECLEN 4
+#define ALIGN 64
 
 /** 
  * @brief vectorised toggle switch stochastic simulation
@@ -101,8 +106,9 @@ simulate_toggle_switch(VSLStreamStatePtr stream,
         vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_BOXMULLER2,stream,2*VECLEN*T,zeta,0.0,1.0);
         
         /* compute state trajectories for this block in SIMD*/
+        int c2;
         #pragma omp simd aligned(zeta:ALIGN, y:ALIGN) 
-        for (int c2=0;c2<VECLEN;c2++)
+        for (c2=0;c2<VECLEN;c2++)
         {
             double u_t, v_t, alpha_u, alpha_v, beta_u, beta_v;
             double _gamma, _sigma, _mu;
@@ -267,7 +273,7 @@ main(int argc,char **argv)
         {
             fprintf(stdout,",%f",obs_vals[i*C + j]);
         }
-        fprintf(stdout,"\n");
+        fprintf(stdout,"\n");  
     }
     exit(0);
 }
