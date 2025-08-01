@@ -50,6 +50,9 @@
 /* OpenMP header */
 #include <omp.h>
 
+#include <stdbool.h> // Include this header for 'bool' in C
+#include <time.h>
+
 /* length of vector processing units and ideal memory alignement*/
 #if defined(__AVX512BW__)
     #define VECLEN 8
@@ -107,7 +110,7 @@ simulate_toggle_switch(VSLStreamStatePtr stream,
         
         /* compute state trajectories for this block in SIMD*/
         int c2;
-        #pragma omp simd aligned(zeta:ALIGN, y:ALIGN) 
+        #pragma omp simd /* aligned(zeta:ALIGN, y:ALIGN) */
         for (c2=0;c2<VECLEN;c2++)
         {
             double u_t, v_t, alpha_u, alpha_v, beta_u, beta_v;
@@ -162,6 +165,12 @@ simulate_toggle_switch(VSLStreamStatePtr stream,
 int 
 main(int argc,char **argv)
 { 
+    time_t start_time = time(NULL);
+
+    int num_threads_supplied;
+
+    bool isThreadsSupplied = false;
+    
     int T, C, K;
     double *theta, *obs_vals;
     int seed, sims;
@@ -198,12 +207,22 @@ main(int argc,char **argv)
     {
         T = (int)atoi(argv[4]);
     }
+
+    /* Check if the number of threads are supplied*/
+    if (argc > 5)
+    {
+        num_threads_supplied = (int)atoi(argv[5]);
+        omp_set_num_threads(num_threads_supplied);
+        isThreadsSupplied = true;
+    }
+
    
     /*allocate aligned memory for noisy observations*/
     obs_vals = (double *)_mm_malloc(C*sims*sizeof(double),ALIGN);
     
     /* allocate aligned memory prior samples that generated the data*/
     theta = (double *)_mm_malloc(K*sims*sizeof(double),ALIGN); 
+
     
     /* compute simulations in parallel*/
     #pragma omp parallel shared(seed,sims,C,obs_vals,theta)
@@ -254,8 +273,19 @@ main(int argc,char **argv)
         vslDeleteStream(&stream);
         _mm_free(zeta);
     }
+
+    time_t end_time = time(NULL);
+    double elapsed_seconds = difftime(end_time, start_time);
+    
+
+    if (isThreadsSupplied)
+    {
+        // Print just the elapsed time for script to capture
+        printf("%f\n", elapsed_seconds);
+    }
    
     /*output prior predicitive samples for postprocessing for ABC*/
+    /*
     fprintf(stdout,"\"Sample\",\"mu\",\"sigma\",\"gamma\",\"alpha_u\",\"beta_u\",\"alpha_v\",\"beta_v\"");
     for (int j=0;j<C;j++)
     {
@@ -275,5 +305,7 @@ main(int argc,char **argv)
         }
         fprintf(stdout,"\n");  
     }
+
+    */
     exit(0);
 }

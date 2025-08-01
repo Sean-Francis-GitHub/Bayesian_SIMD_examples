@@ -16,7 +16,9 @@ R_runtimes <- read.csv("output_R_runtime.csv") %>%
 
 # Merge
 runtimes <- Julia_runtimes %>%
-  bind_rows(R_runtimes)
+  bind_rows(R_runtimes) %>%
+  pivot_wider(id_cols = cores,
+              values_from = )
 
 # Visualise
 ggplot(data = runtimes, aes(x = cores, y = time, colour = Program))+
