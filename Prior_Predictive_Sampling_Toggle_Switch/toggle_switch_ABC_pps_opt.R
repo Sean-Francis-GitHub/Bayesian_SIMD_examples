@@ -1,5 +1,6 @@
 library(tictoc)
 library(doParallel)
+library(dplyr)
 
 # optimized R-base implementation of the toggle switch model
 simulate_toggle_switch_vec <- function(mu,sigma,gam, alpha, beta, T, C) {
@@ -38,6 +39,13 @@ T <- 600
 C <- 8000
 N <- 8064
 
+
+cores <- c(1, 2, 4, 8, 12)
+
+seed <- 123
+set.seed(seed)
+
+time_df <- data.frame()
 for (P in cores) {
     # set up level of parallelism
     cl <- makeCluster(P)
@@ -56,6 +64,16 @@ for (P in cores) {
         c(theta,simulate_toggle_switch_vec(mu,sigma,gam,alpha,beta,T,C))
     }
     print(c(P,N,C,T))
-    toc()
+    time <- toc()
+
+    time_df <- time_df %>%
+        bind_rows(
+            data.frame(
+                "cores" = P,
+                "time" = time$callback_msg
+                )
+            )
     stopCluster(cl)
 }
+
+write.csv(time_df, "output_R_runtime.csv", row.names = FALSE)
