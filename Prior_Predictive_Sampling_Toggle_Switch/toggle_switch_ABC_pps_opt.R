@@ -51,7 +51,7 @@ for (P in cores) {
     cl <- makeCluster(P)
     registerDoParallel(cl)
     # run optimised R simulations
-    tic()
+    t_start <- as.numeric(Sys.time())
     obs_vals2 <- foreach(k = 1:N) %dopar%  {
         theta <- runif(7,c(250.0,0.05,0.05,0.0,0.0,0.0,0.0),
                          c(400.0,0.5,0.35,50.0,50.0,7.0,7.0))
@@ -63,14 +63,14 @@ for (P in cores) {
     
         c(theta,simulate_toggle_switch_vec(mu,sigma,gam,alpha,beta,T,C))
     }
-    print(c(P,N,C,T))
-    time <- toc()
+    # print(c(P,N,C,T))
+    t_end <- as.numeric(Sys.time())
 
     time_df <- time_df %>%
         bind_rows(
             data.frame(
                 "cores" = P,
-                "time" = time$callback_msg
+                "time" = t_end - t_start
                 )
             )
     stopCluster(cl)

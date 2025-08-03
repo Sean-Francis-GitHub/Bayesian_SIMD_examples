@@ -18,10 +18,11 @@ foreach ($threads in $threadCounts) {
     $output = & .\toggle_switch_ABC_pps_vec_par.exe @args
 
     # Extract the elapsed time (assuming output is just the time in seconds)
-    $time = [double]$output.Trim()
+    $time = $output.Trim()
 
     # Append result to CSV
     "$threads,$time" | Out-File -FilePath $outputCsv -Append -Encoding utf8
 
     Write-Host "Run with $threads threads took $time seconds"
 }
+
