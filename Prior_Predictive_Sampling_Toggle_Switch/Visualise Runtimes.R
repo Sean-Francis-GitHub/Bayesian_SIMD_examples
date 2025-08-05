@@ -39,7 +39,7 @@ runtimes %>%
        subtitle = "CPU: Ryzen 5 5600 (4.4Ghz) with PBO enabled")+
   scale_x_continuous(breaks = 1:12,
                      minor_breaks = NULL)+
-  scale_y_log10(
-    # limits = c(10, NA)
-  )+
+  # scale_y_log10(
+  #   # limits = c(10, NA)
+  # )+
   theme_bw()
