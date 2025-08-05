@@ -16,7 +16,7 @@ Julia_runtimes <- read.csv("output_Julia_runtime.csv") %>%
 R_runtimes <- read.csv("output_R_runtime.csv") %>%
   mutate("Program" = "R")
 
-c_runtimes <- read.csv("output_c_runtime.csv") %>% 
+c_runtimes <- read.csv("cl_output_c_runtime.csv") %>% 
   mutate("Program" = "C")
 
 

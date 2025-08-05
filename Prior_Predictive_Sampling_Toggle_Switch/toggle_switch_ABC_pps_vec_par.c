@@ -110,7 +110,7 @@ simulate_toggle_switch(VSLStreamStatePtr stream,
         
         /* compute state trajectories for this block in SIMD*/
         int c2;
-        #pragma omp simd /* aligned(zeta:ALIGN, y:ALIGN) */
+        #pragma omp simd aligned(zeta:ALIGN, y:ALIGN)
         for (c2=0;c2<VECLEN;c2++)
         {
             double u_t, v_t, alpha_u, alpha_v, beta_u, beta_v;
