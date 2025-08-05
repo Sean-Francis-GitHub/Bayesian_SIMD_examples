@@ -3,13 +3,13 @@
   "tasks": [
     {
       "type": "cppbuild",
-      "label": "C/C++: cl.exe build with MKL and OpenMP",
-      "command": "cl.exe",
+      "label": "Intel oneAPI: icx (MSVC-style) with MKL and OpenMP",
+      "command": "icx",
       "args": [
-        "/Zi",
-        "/EHsc",
-        "/nologo",
-        "/openmp:experimental",
+        "/Qopenmp",
+        "/O2",
+        "/MD",
+        "/std:c11",
         "/I", "${env:MKLROOT}\\include",
         "${file}",
         "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
@@ -18,20 +18,17 @@
         "mkl_intel_lp64.lib",
         "mkl_sequential.lib",
         "mkl_core.lib",
-        "libiomp5md.lib",
-        ],
-      "options": {
-        "cwd": "${fileDirname}",
-        "PATH": "${env:PATH};${env:MKLROOT}\\bin"
-      },
-      "problemMatcher": [
-        "$msCompile"
+        "libiomp5md.lib"
       ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": ["$msCompile"],
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "detail": "Build with Intel MKL and OpenMP"
+      "detail": "Intel icx MSVC-style compile with MKL and OpenMP"
     }
   ]
 }

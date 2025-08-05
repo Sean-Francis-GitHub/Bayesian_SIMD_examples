@@ -1,3 +1,5 @@
+# To launch cl compiler:
+
 # Open cmd
 
 # Run:
@@ -7,3 +9,9 @@ call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
 
 cd C:\Users\seanu\Documents\GitHub\Bayesian_SIMD_examples\Prior_Predictive_Sampling_Toggle_Switch
 code .
+
+
+# To launch DCP++/C++ compiler:
+# open Intel oneAPI cmd
+cd C:\Users\seanu\Documents\GitHub\Bayesian_SIMD_examples\Prior_Predictive_Sampling_Toggle_Switch
+code.
