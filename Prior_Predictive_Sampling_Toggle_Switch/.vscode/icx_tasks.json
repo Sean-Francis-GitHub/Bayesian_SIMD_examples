@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "Intel oneAPI: icx (MSVC-style) with MKL and OpenMP",
+      "command": "icx",
+      "args": [
+        "/Qopenmp",
+        "/O2",
+        "/MD",
+        "/std:c11",
+        "/I", "${env:MKLROOT}\\include",
+        "${file}",
+        "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
+        "/link",
+        "/LIBPATH:${env:MKLROOT}\\lib\\intel64",
+        "mkl_intel_lp64.lib",
+        "mkl_sequential.lib",
+        "mkl_core.lib",
+        "libiomp5md.lib"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": ["$msCompile"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Intel icx MSVC-style compile with MKL and OpenMP"
+    }
+  ]
+}
