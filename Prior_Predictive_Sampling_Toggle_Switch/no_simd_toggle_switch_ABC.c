@@ -54,8 +54,6 @@
 #include <time.h>
 
 /* length of vector processing units and ideal memory alignement*/
-
-/*
 #if defined(__AVX512BW__)
     #define VECLEN 8
     #define ALIGN 64
@@ -69,17 +67,10 @@
     #define VECLEN 2
     #define ALIGN 16
 #endif
-*/
-
 
 /* Assume AVX2*/
-/*
 #define VECLEN 4
 #define ALIGN 64
-*/
-
-#define VECLEN 1
-#define ALIGN 8
 
 /** 
  * @brief vectorised toggle switch stochastic simulation
@@ -117,7 +108,9 @@ simulate_toggle_switch(VSLStreamStatePtr stream,
         /* Generate all the random variates for these realisation*/
         vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_BOXMULLER2,stream,2*VECLEN*T,zeta,0.0,1.0);
 
+        /* compute state trajectories for this block in SIMD*/
         int c2;
+        /* #pragma omp simd aligned(zeta, y: ALIGN) */
         for (c2=0;c2<VECLEN;c2++)
         { 
             double u_t, v_t, alpha_u, alpha_v, beta_u, beta_v;

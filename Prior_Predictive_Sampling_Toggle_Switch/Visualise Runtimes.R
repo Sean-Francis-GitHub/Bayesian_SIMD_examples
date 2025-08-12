@@ -17,15 +17,15 @@ Julia_runtimes <- read.csv("output_Julia_runtime.csv") %>%
 R_runtimes <- read.csv("output_R_runtime.csv") %>%
   mutate("Program" = "R")
 
-# c_runtimes <- read.csv("cl_output_c_runtime.csv") %>% 
-#   mutate("Program" = "C")
+cl_runtimes <- read.csv("cl_output_c_runtime.csv") %>%
+  mutate("Program" = "C")
 
 c_runtimes <- read.csv("output_c_runtime.csv") %>% 
-  mutate("Program" = "C")
+  mutate("Program" = "C w/ memory alignment")
 
 
 # Merge
-runtimes <- bind_rows(Julia_runtimes, R_runtimes, c_runtimes) %>%
+runtimes <- bind_rows(Julia_runtimes, R_runtimes, c_runtimes, cl_runtimes) %>%
   pivot_wider(names_from = Program,
               values_from = time)
 
@@ -61,39 +61,41 @@ p1_5 <- runtimes %>%
 
 
 p2 <- runtimes %>% 
-  mutate("Julia" = R / Julia,
-         "C" = R/ C,
-         # "C w/ memory alignment" = `C w/ memory alignment` / R,
-         "R" = R / R) %>% 
+  mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
+         "Julia" = baseline / Julia,
+         "C" = baseline / C,
+         "C w/ memory alignment" = baseline / `C w/ memory alignment`,
+         "R" = baseline / R) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
-  mutate("linetype" = if_else(Program == "R", true = "full", false = "dashed")) %>% 
-  ggplot(data = ., aes(x = cores, y = time, colour = Program, linetype = linetype))+
+  filter(Program != "baseline") %>% 
+  # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
+  ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
   geom_point(size = 2)+
   geom_line(linewidth = 1)+
   labs(x = "Number of threads",
-       y = "Comparison to baseline")+
-  scale_x_continuous(breaks = 1:12,
-                     minor_breaks = NULL)+
+       y = "Speedup from single-threaded R")+
   scale_y_log10()+
   theme_bw()+
   guides(linetype = "none")
 
 p2_5 <- runtimes %>% 
-  mutate("Julia" = R / Julia,
-         "C" = R/ C,
-         # "C w/ memory alignment" = `C w/ memory alignment` / R,
-         "R" = R / R) %>% 
+  mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
+         "Julia" = baseline / Julia,
+         "C" = baseline / C,
+         "C w/ memory alignment" = baseline / `C w/ memory alignment`,
+         "R" = baseline / R) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
-  mutate("linetype" = if_else(Program == "R", true = "full", false = "dashed")) %>% 
-  ggplot(data = ., aes(x = cores, y = time, colour = Program, linetype = linetype))+
+  filter(Program != "baseline") %>% 
+  # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
+  ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
   geom_point(size = 2)+
   geom_line(linewidth = 1)+
   labs(x = "Number of threads",
-       y = "Comparison to baseline")+
+       y = "Speedup from single-threaded R")+
   scale_y_log10()+
   scale_x_log10()+
   theme_bw()+
