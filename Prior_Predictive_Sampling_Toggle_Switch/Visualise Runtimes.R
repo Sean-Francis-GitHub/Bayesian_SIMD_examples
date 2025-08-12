@@ -31,6 +31,7 @@ runtimes <- bind_rows(Julia_runtimes, R_runtimes, c_runtimes, cl_runtimes) %>%
 
 # Visualise
 p1 <- runtimes %>% 
+  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
@@ -43,9 +44,12 @@ p1 <- runtimes %>%
                      minor_breaks = NULL)+
   scale_y_log10()+
   # scale_x_log10()+
-  theme_bw()
+  theme_bw()+
+  theme(text=element_text(size = 15))
+
 
 p1_5 <- runtimes %>% 
+  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
@@ -56,7 +60,9 @@ p1_5 <- runtimes %>%
        y = "Time (s)")+
   scale_y_log10()+
   scale_x_log10()+
-  theme_bw()
+  theme_bw()+
+  theme(text=element_text(size = 15))
+
 
 
 
@@ -66,6 +72,7 @@ p2 <- runtimes %>%
          "C" = baseline / C,
          "C w/ memory alignment" = baseline / `C w/ memory alignment`,
          "R" = baseline / R) %>% 
+  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
@@ -77,8 +84,11 @@ p2 <- runtimes %>%
   labs(x = "Number of threads",
        y = "Speedup from single-threaded R")+
   scale_y_log10()+
+  scale_x_continuous(breaks = 1:12,
+                     minor_breaks = NULL)+
   theme_bw()+
-  guides(linetype = "none")
+  guides(linetype = "none")+
+  theme(text=element_text(size = 15))
 
 p2_5 <- runtimes %>% 
   mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
@@ -99,7 +109,9 @@ p2_5 <- runtimes %>%
   scale_y_log10()+
   scale_x_log10()+
   theme_bw()+
-  guides(linetype = "none")
+  guides(linetype = "none")+
+  theme(text=element_text(size = 15))
+
 
 
 plots <- p1 + p2 + p1_5 + p2_5
