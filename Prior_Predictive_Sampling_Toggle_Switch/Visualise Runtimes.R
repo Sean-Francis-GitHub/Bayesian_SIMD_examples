@@ -41,8 +41,10 @@ p1 <- runtimes %>%
   ggplot(data = ., aes(x = cores, y = time, colour = Program))+
   geom_point(size = 2)+
   geom_line(linewidth = 1)+
-  labs(x = "Number of threads",
-       y = "Time (s)")+
+  labs(
+    #x = "Number of threads",
+    x = "",
+    y = "Time (s)")+
   scale_x_continuous(breaks = 1:12,
                      minor_breaks = NULL)+
   scale_y_log10()+
@@ -51,20 +53,20 @@ p1 <- runtimes %>%
   theme(text=element_text(size = 15))
 
 
-p1_5 <- runtimes %>% 
-  pivot_longer(cols = -cores,
-               names_to = "Program",
-               values_to = "time") %>% 
-  mutate("Program" = str_wrap(Program, width = 20)) %>% 
-  ggplot(data = ., aes(x = cores, y = time, colour = Program))+
-  geom_point(size = 2)+
-  geom_line(linewidth = 1)+
-  labs(x = "Number of threads",
-       y = "Time (s)")+
-  scale_y_log10()+
-  scale_x_log10()+
-  theme_bw()+
-  theme(text=element_text(size = 15))
+# p1_5 <- runtimes %>% 
+#   pivot_longer(cols = -cores,
+#                names_to = "Program",
+#                values_to = "time") %>% 
+#   mutate("Program" = str_wrap(Program, width = 20)) %>% 
+#   ggplot(data = ., aes(x = cores, y = time, colour = Program))+
+#   geom_point(size = 2)+
+#   geom_line(linewidth = 1)+
+#   labs(x = "Number of threads",
+#        y = "Time (s)")+
+#   scale_y_log10()+
+#   scale_x_log10()+
+#   theme_bw()+
+#   theme(text=element_text(size = 15))
 
 
 
@@ -94,34 +96,35 @@ p2 <- runtimes %>%
   guides(linetype = "none")+
   theme(text=element_text(size = 15))
 
-p2_5 <- runtimes %>% 
-  mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
-         "Julia" = baseline / Julia,
-         "C SIMD (no memory alignment)" = baseline / `C SIMD (no memory alignment)`,
-         "C no SIMD" = baseline / `C no SIMD`,
-         "C SIMD" = baseline / `C SIMD`,
-         "R" = baseline / R) %>% 
-  pivot_longer(cols = -cores,
-               names_to = "Program",
-               values_to = "time") %>% 
-  filter(Program != "baseline") %>% 
-  mutate("Program" = str_wrap(Program, width = 20)) %>% 
-  # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
-  ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
-  geom_point(size = 2)+
-  geom_line(linewidth = 1)+
-  labs(x = "Number of threads",
-       y = "Speedup from single-threaded R")+
-  scale_y_log10()+
-  scale_x_log10()+
-  theme_bw()+
-  guides(linetype = "none")+
-  theme(text=element_text(size = 15))
+# p2_5 <- runtimes %>% 
+#   mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
+#          "Julia" = baseline / Julia,
+#          "C SIMD (no memory alignment)" = baseline / `C SIMD (no memory alignment)`,
+#          "C no SIMD" = baseline / `C no SIMD`,
+#          "C SIMD" = baseline / `C SIMD`,
+#          "R" = baseline / R) %>% 
+#   pivot_longer(cols = -cores,
+#                names_to = "Program",
+#                values_to = "time") %>% 
+#   filter(Program != "baseline") %>% 
+#   mutate("Program" = str_wrap(Program, width = 20)) %>% 
+#   # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
+#   ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
+#   geom_point(size = 2)+
+#   geom_line(linewidth = 1)+
+#   labs(x = "Number of threads",
+#        y = "Speedup from single-threaded R")+
+#   scale_y_log10()+
+#   scale_x_log10()+
+#   theme_bw()+
+#   guides(linetype = "none")+
+#   theme(text=element_text(size = 15))
 
 
 
 plots <- p1 / p2# + p1_5 + p2_5
 
-plots + plot_annotation(
-  title = "ABC Toggle Switch Program Runtime Comparison",
-  subtitle = "CPU: Ryzen 5 5600 (4.4Ghz) with PBO enabled")
+plots
+# + plot_annotation(
+#   title = "ABC Toggle Switch Program Runtime Comparison",
+#   subtitle = "CPU: Ryzen 5 5600 (4.4Ghz) with PBO enabled")
