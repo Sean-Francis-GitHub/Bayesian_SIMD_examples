@@ -10,6 +10,7 @@
         "/MD",                      // Link against MSVC runtime DLL
         "/std:c11",                 // Use C11 standard (if supported)
         "/I", "${env:MKLROOT}\\include",  // Include MKL headers
+        "/openmp",                  // Add OpenMP flag to compiler
         "${file}",                  // Source file
         "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe", // Output executable
         "/link",                    // Linker options begin

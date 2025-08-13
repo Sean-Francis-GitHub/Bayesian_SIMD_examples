@@ -12,10 +12,10 @@ $outputCsv = "output_c_runtime.csv"
 # Loop over thread counts
 foreach ($threads in $threadCounts) {
     # Replace these args with your actual arguments, except the 6th (argv[5])
-    $args = @("8064", "123", "8000", "600", "$threads")
+    $arg_vals = @("8064", "123", "8000", "600", "$threads")
 
     # Run the program and capture the output
-    $output = & .\no_pragma_toggle_switch_ABC.exe @args
+    $output = & .\toggle_switch_ABC_pps_vec_par.exe @arg_vals
 
     # Extract the elapsed time (assuming output is just the time in seconds)
     $time = $output.Trim()

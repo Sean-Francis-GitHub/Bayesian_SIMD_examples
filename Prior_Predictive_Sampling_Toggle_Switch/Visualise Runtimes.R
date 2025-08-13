@@ -18,23 +18,26 @@ R_runtimes <- read.csv("output_R_runtime.csv") %>%
   mutate("Program" = "R")
 
 cl_runtimes <- read.csv("cl_output_c_runtime.csv") %>%
-  mutate("Program" = "C")
+  mutate("Program" = "C SIMD (no memory alignment)")
+
+no_simd_runtimes <- read.csv("output_no_simd_c_runtime.csv") %>%
+  mutate("Program" = "C no SIMD")
 
 c_runtimes <- read.csv("output_c_runtime.csv") %>% 
-  mutate("Program" = "C w/ memory alignment")
+  mutate("Program" = "C SIMD")
 
 
 # Merge
-runtimes <- bind_rows(Julia_runtimes, R_runtimes, c_runtimes, cl_runtimes) %>%
+runtimes <- bind_rows(Julia_runtimes, R_runtimes, c_runtimes, cl_runtimes, no_simd_runtimes) %>%
   pivot_wider(names_from = Program,
               values_from = time)
 
 # Visualise
 p1 <- runtimes %>% 
-  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
+  mutate("Program" = str_wrap(Program, width = 20)) %>% 
   ggplot(data = ., aes(x = cores, y = time, colour = Program))+
   geom_point(size = 2)+
   geom_line(linewidth = 1)+
@@ -49,10 +52,10 @@ p1 <- runtimes %>%
 
 
 p1_5 <- runtimes %>% 
-  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
+  mutate("Program" = str_wrap(Program, width = 20)) %>% 
   ggplot(data = ., aes(x = cores, y = time, colour = Program))+
   geom_point(size = 2)+
   geom_line(linewidth = 1)+
@@ -69,14 +72,15 @@ p1_5 <- runtimes %>%
 p2 <- runtimes %>% 
   mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
          "Julia" = baseline / Julia,
-         "C" = baseline / C,
-         "C w/ memory alignment" = baseline / `C w/ memory alignment`,
+         "C SIMD (no memory alignment)" = baseline / `C SIMD (no memory alignment)`,
+         "C no SIMD" = baseline / `C no SIMD`,
+         "C SIMD" = baseline / `C SIMD`,
          "R" = baseline / R) %>% 
-  rename("C w/ memory\nalignment" = `C w/ memory alignment`) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
   filter(Program != "baseline") %>% 
+  mutate("Program" = str_wrap(Program, width = 20)) %>% 
   # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
   ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
   geom_point(size = 2)+
@@ -93,13 +97,15 @@ p2 <- runtimes %>%
 p2_5 <- runtimes %>% 
   mutate("baseline" = runtimes %>% filter(cores == 1) %>% pull(R),
          "Julia" = baseline / Julia,
-         "C" = baseline / C,
-         "C w/ memory alignment" = baseline / `C w/ memory alignment`,
+         "C SIMD (no memory alignment)" = baseline / `C SIMD (no memory alignment)`,
+         "C no SIMD" = baseline / `C no SIMD`,
+         "C SIMD" = baseline / `C SIMD`,
          "R" = baseline / R) %>% 
   pivot_longer(cols = -cores,
                names_to = "Program",
                values_to = "time") %>% 
   filter(Program != "baseline") %>% 
+  mutate("Program" = str_wrap(Program, width = 20)) %>% 
   # mutate("linetype" = if_else(Program == "baseline", true = "full", false = "dashed")) %>% 
   ggplot(data = ., aes(x = cores, y = time, colour = Program))+# , linetype = linetype))+
   geom_point(size = 2)+
@@ -114,7 +120,7 @@ p2_5 <- runtimes %>%
 
 
 
-plots <- p1 + p2 + p1_5 + p2_5
+plots <- p1 / p2# + p1_5 + p2_5
 
 plots + plot_annotation(
   title = "ABC Toggle Switch Program Runtime Comparison",

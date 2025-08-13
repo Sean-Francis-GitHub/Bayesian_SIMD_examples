@@ -1,7 +1,7 @@
 # PowerShell Script: benchmark_c_code.ps1
 
 # List of thread counts you want to test
-$threadCounts = @(1, 2, 4, 8, 12)
+$threadCounts = @(12, 8, 4, 2, 1)
 
 # Output CSV file
 $outputCsv = "output_no_simd_c_runtime.csv"
@@ -12,10 +12,10 @@ $outputCsv = "output_no_simd_c_runtime.csv"
 # Loop over thread counts
 foreach ($threads in $threadCounts) {
     # Replace these args with your actual arguments, except the 6th (argv[5])
-    $args = @("8064", "123", "8000", "600", "$threads")
+    $arg_vals = @("8064", "123", "8000", "600", "$threads")
 
     # Run the program and capture the output
-    $output = & .\no_simd_toggle_switch_ABC.exe @args
+    $output = & .\no_simd_toggle_switch_ABC.exe @arg_vals
 
     # Extract the elapsed time (assuming output is just the time in seconds)
     $time = $output.Trim()
@@ -25,5 +25,3 @@ foreach ($threads in $threadCounts) {
 
     Write-Host "Run with $threads threads took $time seconds"
 }
-
-
